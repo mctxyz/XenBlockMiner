@@ -33,7 +33,7 @@ class MinerApp(tk.Tk):
         self.current_difficulty = 0  # Initialize to a default value
 
         # GUI setup
-        self.title("XEN.pub's XenMiner Wrapper")
+        self.title("Xen Block Miner")
         self.geometry("1028x768")
         self.setup_ui()
         self.running_processes = []
@@ -45,16 +45,16 @@ class MinerApp(tk.Tk):
 
         self.footer_frame = self.create_footer_frame()
         self.create_links_in_footer()
-        self.eth_address = self.create_label_and_entry("Your Ethereum Address", 1, self.load_eth_address())
-        self.python_env = self.create_label_and_entry("Python Environment Location", 2, self.load_python_env())
-        self.create_label_and_combobox("Parallel Executions (one per core)", 3)
+        self.eth_address = self.create_label_and_entry("你的ETH钱包地址", 1, self.load_eth_address())
+        self.python_env = self.create_label_and_entry("Python 环境路径", 2, self.load_python_env())
+        self.create_label_and_combobox("并发数", 3)
         self.button_frame = tk.Frame(self)
         self.button_frame.grid(row=4, column=0, columnspan=2, pady=5)
-        self.run_btn = tk.Button(self.button_frame, text="Run", command=self.run_script,
-                                 background='green', foreground='white', font=("Arial", 12, "bold"))
+        self.run_btn = tk.Button(self.button_frame, text="运行", command=self.run_script,
+                                 background='green', foreground='grey', font=("Arial", 12, "bold"))
         self.run_btn.grid(row=4, column=0, padx=5)
-        self.stop_btn = tk.Button(self.button_frame, text="Stop", command=self.stop_script,
-                                  state=tk.DISABLED, background='light grey', foreground='white', font=("Arial", 12, "bold"))
+        self.stop_btn = tk.Button(self.button_frame, text="停止", command=self.stop_script,
+                                  state=tk.DISABLED, background='light grey', foreground='grey', font=("Arial", 12, "bold"))
         self.stop_btn.grid(row=4, column=1, padx=5)
         self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(row=6, column=0, columnspan=2, sticky="nsew", padx=10, pady=10)
@@ -62,7 +62,7 @@ class MinerApp(tk.Tk):
         self.grid_columnconfigure(1, weight=1)
         self.footer_frame.grid(row=7, column=0, columnspan=2)
 
-        self.python_env_label = tk.Label(self, text="Python Environment Location")
+        self.python_env_label = tk.Label(self, text="Python 环境路径")
         self.python_env_label.grid(row=2, column=0, padx=10, pady=10, sticky="e")
 
         self.python_paths = self.find_python_paths()
@@ -262,17 +262,17 @@ class MinerApp(tk.Tk):
         threading.Thread(target=run, daemon=True).start()
 
     def reset_footer_labels(self):
-        self.footer_blocks_var.set("Found Blocks: --")
-        self.footer_hash_rate_var.set("Total Hash/s: --")
-        self.footer_latest_found_var.set("Latest Block (time): --")
-        self.footer_difficulty_var.set("Difficulty: --")
+        self.footer_blocks_var.set("出块数: --")
+        self.footer_hash_rate_var.set("总算力 Hash/s: --")
+        self.footer_latest_found_var.set("最后出块: --")
+        self.footer_difficulty_var.set("难度: --")
         self.footer_blocks_per_day_var.set("Est. Blocks/Day: --")
-        self.footer_elapsed_time_var.set("Elapsed Time: --")
+        self.footer_elapsed_time_var.set("运行时间: --")
 
     def update_total_hash_rate(self):
-        self.footer_blocks_var.set(f"Found Blocks: {self.valid_hash_count:,}")
+        self.footer_blocks_var.set(f"出块数: {self.valid_hash_count:,}")
         total_hash_rate = sum(self.miner_hash_rates.values())
-        self.footer_hash_rate_var.set(f"Total Hash/s: {total_hash_rate:,.2f}")
+        self.footer_hash_rate_var.set(f"算力 Hash/s: {total_hash_rate:,.2f}")
         elapsed_time_in_seconds = (datetime.now() - self.start_time).total_seconds()
         if elapsed_time_in_seconds != 0:
             blocks_per_day = (self.valid_hash_count / elapsed_time_in_seconds) * 86400
@@ -280,14 +280,14 @@ class MinerApp(tk.Tk):
             blocks_per_day = 0
 
         if hasattr(self, 'last_found_block_time'):
-            self.footer_latest_found_var.set(f"Latest Found: {self.last_found_block_time}")
+            self.footer_latest_found_var.set(f"最后出块: {self.last_found_block_time}")
 
         if isinstance(self.current_difficulty, (int, float)):
-            self.footer_difficulty_var.set(f"Difficulty: {self.current_difficulty:,}")
+            self.footer_difficulty_var.set(f"难度: {self.current_difficulty:,}")
         else:
-            self.footer_difficulty_var.set(f"Difficulty: {self.current_difficulty}")
+            self.footer_difficulty_var.set(f"难度: {self.current_difficulty}")
 
-        self.footer_elapsed_time_var.set(f"Elapsed Time: {self.get_elapsed_time()}")
+        self.footer_elapsed_time_var.set(f"运行时间: {self.get_elapsed_time()}")
         self.footer_blocks_per_day_var.set(f"Est. Blocks/Day: {blocks_per_day:.6f}")
 
         self.after(1000, self.update_total_hash_rate)
@@ -374,12 +374,13 @@ class MinerApp(tk.Tk):
 
     def create_footer_frame(self):
         footer_frame = ttk.Frame(self)
-        self.footer_blocks_var = tk.StringVar(value="Found Blocks: --")
-        self.footer_hash_rate_var = tk.StringVar(value="Total Hash/s: --")
-        self.footer_latest_found_var = tk.StringVar(value="Latest Block (time): 0")
-        self.footer_difficulty_var = tk.StringVar(value=f"Difficulty: {self.current_difficulty}")
-        self.footer_elapsed_time_var = tk.StringVar(value="Elapsed Time: --")
+        self.footer_blocks_var = tk.StringVar(value="出块数: --")
+        self.footer_hash_rate_var = tk.StringVar(value="总算力 Hash/s: --")
+        self.footer_latest_found_var = tk.StringVar(value="最后出块: 0")
+        self.footer_difficulty_var = tk.StringVar(value=f"难度: {self.current_difficulty}")
+        self.footer_elapsed_time_var = tk.StringVar(value="运行时间: --")
         self.footer_blocks_per_day_var = tk.StringVar(value="Est. Blocks/Day: --")
+
 
         footer_blocks_label = ttk.Label(footer_frame, textvariable=self.footer_blocks_var)
         footer_hash_rate_label = ttk.Label(footer_frame, textvariable=self.footer_hash_rate_var)
@@ -398,17 +399,17 @@ class MinerApp(tk.Tk):
         return footer_frame
 
     def create_links_in_footer(self):
-        link1 = tk.Label(self.footer_frame, text="XenMiner", fg="blue", cursor="hand2")
-        link1.bind("<Button-1>", lambda e: self.open_webpage("https://github.com/jacklevin74/xenminer"))
+        link1 = tk.Label(self.footer_frame, text=" ", fg="blue", cursor="hand2")
+        # link1.bind("<Button-1>", lambda e: self.open_webpage("https://github.com/jacklevin74/xenminer"))
         link1.grid(row=1, column=2, sticky='w')
 
-        link2 = tk.Label(self.footer_frame, text="XM Wrapper", fg="blue", cursor="hand2")
-        link2.bind("<Button-1>", lambda e: self.open_webpage("https://github.com/JozefJarosciak/XenMinerWrapper/"))
-        link2.grid(row=1, column=3, sticky='w')
+        # link2 = tk.Label(self.footer_frame, text="XM Wrapper", fg="blue", cursor="hand2")
+        # link2.bind("<Button-1>", lambda e: self.open_webpage("https://github.com/JozefJarosciak/XenMinerWrapper/"))
+        # link2.grid(row=1, column=3, sticky='w')
 
-        link3 = tk.Label(self.footer_frame, text="XenBlocks Dashboard", fg="blue", cursor="hand2")
-        link3.bind("<Button-1>", lambda e: self.open_webpage("https://xen.pub/index-xenblocks.php"))
-        link3.grid(row=1, column=4, sticky='w')
+        # link3 = tk.Label(self.footer_frame, text="XenBlocks Dashboard", fg="blue", cursor="hand2")
+        # link3.bind("<Button-1>", lambda e: self.open_webpage("https://xen.pub/index-xenblocks.php"))
+        # link3.grid(row=1, column=4, sticky='w')
 
     def find_python_paths(self):
         python_paths = set()
